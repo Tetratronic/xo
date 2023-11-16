@@ -15,12 +15,12 @@ const gameBoard = (function () {
 
             (cells[0] == 'X' || cells[0] == 'O') && cells[0] == cells[3] && cells[0] == cells[6] ||
             (cells[1] == 'X' || cells[1] == 'O') && cells[1] == cells[4] && cells[1] == cells[7] ||
-            (cells[2] == 'X' || cells[2] == 'O') && cells[2] == cells[5] && cells[2] == cells[2]){
+            (cells[2] == 'X' || cells[2] == 'O') && cells[2] == cells[5] && cells[2] == cells[8]){
             return 1;
         }
         return false;
     }
-    return {printBoard, populateBoard, checkWin};
+    return {printBoard, populateBoard, checkWin, cells};
 })();
 
 //Game Loop;
@@ -70,7 +70,7 @@ const gameController = (function(){
     }
 
     const getActivePlayer = () => {
-        activePlayer;
+        return activePlayer;
     }
 
     const printNewBoard = () => {
@@ -96,5 +96,36 @@ const gameController = (function(){
 
     printNewBoard();
 
-    return{playRound};
+    return{playRound, getActivePlayer};
+})();
+
+const screenController = (function(){
+
+    const currentPlayer = document.querySelector('.currentplayer');
+    const boardDiv = document.querySelector('.board');
+
+    const updateScreen = () => {
+        boardDiv.textContent = "";
+        const currentlyPlaying = gameController.getActivePlayer();
+        currentPlayer.textContent = `${currentlyPlaying.name}'s Turn.....`
+
+        gameBoard.cells.forEach((element,index) => {
+            const cellBtn = document.createElement("button");
+            cellBtn.classList.add('cell')
+            cellBtn.dataset.column = index;
+            cellBtn.textContent = element;
+            boardDiv.appendChild(cellBtn);
+        });
+    };
+
+    function handleClick(e){
+        const selectedCell = e.target.dataset.column;
+        if (!selectedCell) return;
+
+        gameController.playRound(selectedCell);
+        updateScreen();
+    }
+    boardDiv.addEventListener("click", handleClick);
+
+    updateScreen();
 })();
